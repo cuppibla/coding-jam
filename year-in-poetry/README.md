@@ -1,6 +1,8 @@
 # Year in Poetry (My Year in Moments)
 
-A beautiful, scroll-driven web experience that turns your meaningful dates into a quietly emotional, AI-curated calendar. "Your whole year, laid out like a poem."
+A quiet, late-night web experience that turns your meaningful dates into an AI-curated year you can read like a poem.
+
+**Visual aesthetic:** [listening-room](../../skills-garden/ux-design-skills/listening-room.md) — warm-dark canvas, breathing host orb, drifting dust, broadcast chrome. No hero artifact: the user's moments are the visual.
 
 ## Setup Instructions
 

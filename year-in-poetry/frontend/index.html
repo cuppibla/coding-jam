@@ -3,180 +3,160 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Tell us the dates that matter to you. We'll turn your year into something sparkly — Y2K dreamcore edition." />
-  <title>✦ MY YEAR IN MOMENTS ✦</title>
+  <meta name="description" content="A quiet, scroll-driven year of moments. Tell us the dates that mattered — we'll lay them out like a year you can read at night." />
+  <title>my year in moments</title>
 
-  <!-- Fonts: Y2K Dreamcore typography system -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=VT323&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Background layers — the holographic mall canvas -->
-  <div class="bg-layers">
-    <div class="bg-hologram"></div>
-    <div class="bg-sparkle"></div>
-    <div class="bg-shimmer"></div>
+
+  <!-- Canvas: warm-tinted near-black with corner gradients -->
+  <div class="canvas-bg" aria-hidden="true"></div>
+
+  <!-- Ambient motion: drifting dust (one effect across the app) -->
+  <div class="ambient ambient-dust" aria-hidden="true">
+    <span class="dust" style="left:8%;animation-delay:-12s;animation-duration:68s"></span>
+    <span class="dust" style="left:17%;animation-delay:-30s;animation-duration:54s"></span>
+    <span class="dust" style="left:24%;animation-delay:-5s;animation-duration:72s"></span>
+    <span class="dust" style="left:33%;animation-delay:-22s;animation-duration:60s"></span>
+    <span class="dust" style="left:41%;animation-delay:-8s;animation-duration:84s"></span>
+    <span class="dust" style="left:52%;animation-delay:-34s;animation-duration:50s"></span>
+    <span class="dust" style="left:61%;animation-delay:-17s;animation-duration:76s"></span>
+    <span class="dust" style="left:69%;animation-delay:-2s;animation-duration:64s"></span>
+    <span class="dust" style="left:78%;animation-delay:-26s;animation-duration:58s"></span>
+    <span class="dust" style="left:88%;animation-delay:-11s;animation-duration:80s"></span>
+    <span class="dust" style="left:94%;animation-delay:-19s;animation-duration:66s"></span>
   </div>
 
-  <!-- Floating decorative chrome bits (visible across all screens) -->
-  <div class="floating-deco floating-deco-tl" aria-hidden="true">
-    <div class="chrome-window mini-window">
-      <div class="chrome-window-header">
-        <span class="hdr-left">[X]</span>
-        <span class="hdr-title">system.ini</span>
-        <span class="hdr-right">✨</span>
-      </div>
-      <div class="mini-window-body">
-        <span class="pixel-line">C:\&gt; READY_</span>
-      </div>
-    </div>
+  <!-- Broadcast chrome: top bar (visible across screens) -->
+  <header class="chrome-top" aria-hidden="false">
+    <span class="chrome-slot chrome-slot-left"></span>
+    <span class="chrome-slot chrome-slot-center">my year in moments</span>
+    <span class="chrome-slot chrome-slot-right" id="chrome-time"></span>
+  </header>
+
+  <!-- Host presence orb: bottom-right, persistent. Hidden on loading (SVG takes over). -->
+  <div class="host-orb" id="host-orb" aria-hidden="true">
+    <div class="orb-glow"></div>
+    <div class="orb-core"></div>
+    <span class="orb-label">narrator</span>
   </div>
 
-  <div class="floating-deco floating-deco-br" aria-hidden="true">
-    <div class="chrome-window mini-window">
-      <div class="chrome-window-header">
-        <span class="hdr-left">[X]</span>
-        <span class="hdr-title">heart.exe</span>
-        <span class="hdr-right">♥</span>
-      </div>
-      <div class="mini-window-body">
-        <span class="pixel-line">♪ NOW PLAYING ♪</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Scroll progress bar -->
-  <div class="scroll-progress" id="scroll-progress"></div>
-
-  <!-- ========== SCREEN 1: LANDING — Holographic Mall Layout ========== -->
+  <!-- ========== SCREEN 1: LANDING ========== -->
   <section id="screen-landing" class="screen active">
-    <div class="landing-layout">
-
-      <!-- Main chrome window: title + CTA -->
-      <div class="chrome-window landing-main-window">
-        <div class="chrome-window-header">
-          <span class="hdr-left">[X]</span>
-          <span class="hdr-title">C:\YEAR\MOMENTS.EXE</span>
-          <span class="hdr-right">🛍 ✨ ♪</span>
-        </div>
-        <div class="chrome-window-body">
-          <p class="kicker pixel-line">★ WELCOME TO THE WORLD OF ★</p>
-          <h1 class="landing-title" id="landing-title">
-            <span class="word">MY</span>
-            <span class="word">YEAR</span>
-            <span class="word word-accent">in</span>
-            <span class="word">MOMENTS</span>
-          </h1>
-          <div class="landing-line" id="landing-line"></div>
-          <p class="landing-subtitle" id="landing-subtitle">
-            the dates that shaped your year —<br />
-            we'll turn them into something sparkly to keep forever ✦
-          </p>
-          <button class="btn-y2k btn-begin" id="btn-begin">
-            <span class="btn-text">✦ START THE TRANSFORMATION ✦</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Heroine in her own overlapping chrome window -->
-      <div class="chrome-window heroine-window" id="heroine-window">
-        <div class="chrome-window-header">
-          <span class="hdr-left">[X]</span>
-          <span class="hdr-title">heroine.bmp</span>
-          <span class="hdr-right">📷 ✨</span>
-        </div>
-        <div class="chrome-window-body heroine-body">
-          <img
-            src="y2k-heroine.png"
-            alt="Y2K dreamcore heroine — sparkly holographic chrome aesthetic"
-            class="heroine-img"
-            id="heroine-img"
-          />
-        </div>
-      </div>
-
-      <!-- Decorative download dialog popping over the corner -->
-      <div class="chrome-window download-deco" aria-hidden="true">
-        <div class="chrome-window-header">
-          <span class="hdr-left">DOWNLOADING DREAM...</span>
-          <span class="hdr-right">[X]</span>
-        </div>
-        <div class="download-deco-body">
-          <div class="progress-bar mini-progress">
-            <div class="progress-fill" style="width: 76%"></div>
-          </div>
-          <span class="pixel-line">76% — please wait ♥</span>
-        </div>
-      </div>
-
+    <div class="stage stage-centered">
+      <p class="kicker">a quiet collection of the days that mattered</p>
+      <h1 class="hero-title" id="landing-title">
+        <span class="word">my year</span>
+        <span class="word word-italic">in</span>
+        <span class="word">moments</span>
+      </h1>
+      <div class="hero-rule" id="landing-line"></div>
+      <p class="hero-sub" id="landing-subtitle">
+        add the dates that shaped your year — birthdays, milestones, the small days you don't want to forget.<br />
+        we'll lay them out like a year you can read at night.
+      </p>
+      <button class="btn-primary" id="btn-begin">
+        <span class="btn-text">begin</span>
+      </button>
     </div>
   </section>
 
   <!-- ========== SCREEN 2: DATE INPUT ========== -->
   <section id="screen-input" class="screen">
-    <div class="chrome-window input-window">
-      <div class="chrome-window-header">
-        <span class="hdr-left">[X]</span>
-        <span class="hdr-title">YOUR_MOMENTS.DAT</span>
-        <span class="hdr-right">💌 ✨ ♪</span>
+    <div class="stage stage-scroll">
+      <h2 class="stage-heading">your moments</h2>
+      <p class="stage-sub">
+        add the dates that shaped your year — birthdays, milestones, the day everything changed.
+      </p>
+
+      <div id="moments-list" class="moments-list">
+        <!-- Moment rows inserted here by JS -->
       </div>
-      <div class="chrome-window-body">
-        <h2 class="input-heading">YOUR MOMENTS ✦</h2>
-        <p class="input-subheading">
-          Add the dates that shaped your year — birthdays, milestones, the day everything changed.
-        </p>
 
-        <div id="moments-list" class="moments-list">
-          <!-- Moment cards (mini chrome windows) inserted here by JS -->
-        </div>
+      <button class="btn-add" id="btn-add-moment">
+        <span class="add-icon">+</span>
+        <span>add another moment</span>
+      </button>
 
-        <button class="btn-add-moment" id="btn-add-moment">
-          <span class="add-icon">+</span>
-          <span>ADD ANOTHER MOMENT</span>
-        </button>
-
-        <!-- Suggestion ghost chips -->
-        <div class="suggestions" id="suggestions">
-          <p class="suggestions-label">need ideas? ✦</p>
-          <button class="suggestion-chip" data-desc="A birthday that matters to you">🎂 a birthday</button>
-          <button class="suggestion-chip" data-desc="A milestone you're proud of">🏆 a milestone</button>
-          <button class="suggestion-chip" data-desc="A day that changed everything">💫 a turning point</button>
-        </div>
-
-        <div class="input-bottom-bar">
-          <span class="moment-counter pixel-line" id="moment-counter">0 MOMENTS ADDED</span>
-          <button class="btn-y2k btn-generate" id="btn-generate" disabled>
-            <span class="btn-text">✦ GENERATE ✦</span>
-            <span class="btn-sparkle">♪</span>
-          </button>
-        </div>
+      <div class="suggestions" id="suggestions">
+        <p class="suggestions-label">need ideas?</p>
+        <button class="suggestion-chip" data-desc="A birthday that matters to you">a birthday</button>
+        <button class="suggestion-chip" data-desc="A milestone you're proud of">a milestone</button>
+        <button class="suggestion-chip" data-desc="A day that changed everything">a turning point</button>
       </div>
+    </div>
+
+    <div class="chrome-bottom">
+      <span class="chrome-meta" id="moment-counter">0 moments added</span>
+      <button class="btn-primary btn-compact" id="btn-generate" disabled>
+        <span class="btn-text">generate</span>
+      </button>
     </div>
   </section>
 
-  <!-- ========== SCREEN 3: LOADING / DOWNLOAD WINDOW ========== -->
+  <!-- ========== SCREEN 3: LOADING — SVG orbit animation ========== -->
   <section id="screen-loading" class="screen">
-    <div class="chrome-window loading-window">
-      <div class="chrome-window-header">
-        <span class="hdr-left">[X]</span>
-        <span class="hdr-title">SYSTEM.EXE — please wait</span>
-        <span class="hdr-right">⚡ ✨</span>
-      </div>
-      <div class="chrome-window-body loading-body">
-        <div class="loading-sparkle-row">
-          <span class="big-sparkle">✦</span>
-          <span class="big-sparkle big-sparkle-2">✧</span>
-          <span class="big-sparkle big-sparkle-3">⭒</span>
-        </div>
-        <p class="loading-text pixel-line" id="loading-text">DOWNLOADING YOUR YEAR... 0%</p>
-        <div class="progress-bar big-progress" id="big-progress">
-          <div class="progress-fill" id="big-progress-fill" style="width: 0%"></div>
-        </div>
-        <p class="loading-substext">please don't close this window ♥</p>
-      </div>
+    <div class="stage stage-centered">
+
+      <svg class="loading-orbit" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <radialGradient id="orb-glow-grad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#fff2d6" stop-opacity="0.9"/>
+            <stop offset="35%"  stop-color="#FFB89E" stop-opacity="0.55"/>
+            <stop offset="70%"  stop-color="#FFCF8A" stop-opacity="0.2"/>
+            <stop offset="100%" stop-color="#FFCF8A" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="orb-core-grad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#fff2d6"/>
+            <stop offset="55%"  stop-color="#FFCF8A"/>
+            <stop offset="100%" stop-color="#FFB89E" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="dot-grad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#fff2d6"/>
+            <stop offset="60%"  stop-color="#FFCF8A"/>
+            <stop offset="100%" stop-color="#FFCF8A" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- Faint outer ring -->
+        <circle cx="200" cy="200" r="155" fill="none"
+                stroke="rgba(232,224,212,0.08)" stroke-width="0.5"/>
+
+        <!-- Slow rotating arc — traces the orbit -->
+        <g class="orbit-arc-group">
+          <circle cx="200" cy="200" r="155" fill="none"
+                  stroke="#FFCF8A" stroke-width="1" stroke-linecap="round"
+                  stroke-dasharray="40 933" opacity="0.35"/>
+        </g>
+
+        <!-- 12 month dots — staggered light-up -->
+        <g class="month-dots">
+          <circle class="month-dot d1"  cx="200" cy="45"  r="4"/>
+          <circle class="month-dot d2"  cx="278" cy="66"  r="4"/>
+          <circle class="month-dot d3"  cx="334" cy="122" r="4"/>
+          <circle class="month-dot d4"  cx="355" cy="200" r="4"/>
+          <circle class="month-dot d5"  cx="334" cy="278" r="4"/>
+          <circle class="month-dot d6"  cx="278" cy="334" r="4"/>
+          <circle class="month-dot d7"  cx="200" cy="355" r="4"/>
+          <circle class="month-dot d8"  cx="122" cy="334" r="4"/>
+          <circle class="month-dot d9"  cx="66"  cy="278" r="4"/>
+          <circle class="month-dot d10" cx="45"  cy="200" r="4"/>
+          <circle class="month-dot d11" cx="66"  cy="122" r="4"/>
+          <circle class="month-dot d12" cx="122" cy="66"  r="4"/>
+        </g>
+
+        <!-- Center orb -->
+        <circle class="loading-orb-glow" cx="200" cy="200" r="78" fill="url(#orb-glow-grad)"/>
+        <circle class="loading-orb-core" cx="200" cy="200" r="22" fill="url(#orb-core-grad)"/>
+      </svg>
+
+      <p class="loading-text" id="loading-text">reading your moments…</p>
+      <p class="loading-substext">a year takes a few seconds to remember.</p>
     </div>
   </section>
 
@@ -193,18 +173,21 @@
       <!-- JS renders opening, chapter cards, and closing here -->
     </div>
 
-    <!-- Navigation bar -->
-    <div class="story-nav" id="story-nav">
-      <button class="btn-story-nav btn-prev" id="btn-prev-chapter" disabled>
-        <span>← PREV</span>
+    <!-- Bottom chrome bar: prev/next + chapter indicator -->
+    <div class="chrome-bottom story-nav" id="story-nav">
+      <button class="btn-chrome btn-prev" id="btn-prev-chapter" disabled>
+        <span>← prev</span>
       </button>
-      <span class="chapter-indicator pixel-line" id="chapter-indicator">01 / 05</span>
-      <button class="btn-story-nav btn-next" id="btn-next-chapter">
-        <span>NEXT →</span>
+      <span class="chrome-meta" id="chapter-indicator">01 / 05</span>
+      <button class="btn-chrome btn-next" id="btn-next-chapter">
+        <span>next →</span>
       </button>
     </div>
 
   </section>
+
+  <!-- Scroll progress retained as hidden compatibility shim (legacy id) -->
+  <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
 
   <script src="app.js"></script>
 </body>

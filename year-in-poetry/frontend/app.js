@@ -1,6 +1,6 @@
 /* ============================================
-   MY YEAR IN MOMENTS — Y2K Dreamcore Edition
-   Application Logic — Cinematic Story Flow
+   my year in moments — listening-room edition
+   ref: skills-garden/ux-design-skills/listening-room.md
    ============================================ */
 
 const API_URL = '/api/generate';
@@ -8,24 +8,29 @@ const MONTH_NAMES = ['January','February','March','April','May','June',
   'July','August','September','October','November','December'];
 const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
-// Y2K Dreamcore holographic accent palette
+// Listening-room accent palette (six warm tints, cycles across chapters)
 const ACCENT_COLORS = [
-  '#FF3DC7', // neon magenta
-  '#C8B6FF', // hologram lavender
-  '#3DDCFF', // neon cyan
-  '#FFB6E1', // hologram pink
-  '#B8F2E6', // hologram mint
-  '#FFD6BA', // hologram peach
+  '#FFB89E', // peach
+  '#FFCF8A', // amber
+  '#FFD98A', // firefly
+  '#B8E3A8', // sage
+  '#D18A5B', // terra
+  '#FF4D9E', // magenta
 ];
+
+function hexToRgb(hex) {
+  const m = hex.replace('#', '').match(/.{2}/g);
+  return m ? m.map(x => parseInt(x, 16)).join(', ') : '255, 207, 138';
+}
 
 const PLACEHOLDERS = [
   "the day i moved to san francisco",
-  "mom's birthday ✦",
-  "our anniversary ♥",
+  "mom's birthday",
+  "our anniversary",
   "the day i got promoted",
   "when i adopted my cat, miso",
   "first day at my new job",
-  "the day we met ♪",
+  "the day we met",
   "graduation day",
 ];
 
@@ -50,13 +55,22 @@ const $btnGenerate    = document.getElementById('btn-generate');
 const $btnBegin       = document.getElementById('btn-begin');
 const $btnAdd         = document.getElementById('btn-add-moment');
 const $loadingText    = document.getElementById('loading-text');
-const $bigProgressFill = document.getElementById('big-progress-fill');
 const $scrollProgress  = document.getElementById('scroll-progress');
 const $storyViewport  = document.getElementById('story-viewport');
 const $storyTimeline  = document.getElementById('story-timeline');
 const $btnPrev        = document.getElementById('btn-prev-chapter');
 const $btnNext        = document.getElementById('btn-next-chapter');
 const $chapterIndicator = document.getElementById('chapter-indicator');
+const $hostOrb        = document.getElementById('host-orb');
+const $chromeTime     = document.getElementById('chrome-time');
+
+// Set today's date stamp in the top-right chrome slot
+if ($chromeTime) {
+  const _now = new Date();
+  const _day = DAY_NAMES[_now.getDay()].slice(0, 3);
+  const _mo  = MONTH_NAMES[_now.getMonth()].slice(0, 3);
+  $chromeTime.textContent = `${_day} · ${_mo} ${_now.getDate()} · ${_now.getFullYear()}`;
+}
 
 // ─── Screen transitions ───
 function showScreen(target) {
@@ -71,8 +85,11 @@ function showScreen(target) {
   setTimeout(() => {
     target.style.display = 'flex';
     requestAnimationFrame(() => { target.classList.add('active'); });
-    // Hide scroll progress for story (we use timeline dots instead)
-    $scrollProgress.classList.remove('visible');
+
+    // Persistent host orb hides on the loading screen (SVG orb takes over)
+    if ($hostOrb) {
+      $hostOrb.classList.toggle('hidden', target === $loading);
+    }
   }, 450);
 }
 
@@ -86,25 +103,25 @@ function createMomentCard(index, prefill = {}) {
 
   card.innerHTML = `
     <div class="card-header">
-      <span class="card-number">FILE_${String(index + 1).padStart(2, '0')}.MOMENT</span>
+      <span class="card-number">moment ${String(index + 1).padStart(2, '0')}</span>
       <button class="btn-remove" title="Remove">×</button>
     </div>
     <div class="card-fields">
       <div class="field-group">
-        <label class="field-label">Date</label>
+        <label class="field-label">date</label>
         <input type="date" class="field-input" data-field="date"
                value="${prefill.date || ''}" min="${currentYear}-01-01" max="${currentYear}-12-31" />
       </div>
       <div class="field-group">
-        <label class="field-label">What happened?</label>
+        <label class="field-label">what happened</label>
         <input type="text" class="field-input" data-field="description"
                placeholder="${prefill.description || placeholder}" maxlength="100"
                value="${prefill.description || ''}" />
       </div>
       <div class="field-group">
-        <label class="field-label">Who is this about? (optional)</label>
+        <label class="field-label">who is this about (optional)</label>
         <input type="text" class="field-input" data-field="person"
-               placeholder="e.g. luna, my golden retriever ♥" maxlength="60"
+               placeholder="e.g. luna, my golden retriever" maxlength="60"
                value="${prefill.person || ''}" />
       </div>
     </div>
@@ -141,7 +158,7 @@ function renumberCards() {
   $momentsList.querySelectorAll('.moment-card').forEach((card, i) => {
     card.dataset.index = i;
     card.querySelector('.card-number').textContent =
-      `FILE_${String(i + 1).padStart(2, '0')}.MOMENT`;
+      `moment ${String(i + 1).padStart(2, '0')}`;
   });
 }
 
@@ -157,30 +174,32 @@ function syncMoments() {
   });
 
   const count = moments.length;
-  $counter.textContent = `${count} MOMENT${count !== 1 ? 'S' : ''} ADDED`;
+  $counter.textContent = `${count} moment${count !== 1 ? 's' : ''} added`;
   $btnGenerate.disabled = count < 3;
 }
 
-// ─── Loading animation (Y2K download window) ───
+// ─── Loading animation — status text cycles while SVG orbit animates ───
 function runLoadingAnimation() {
   const steps = [
-    { text: 'INITIALIZING DREAM.EXE...', pct: 8 },
-    { text: 'DOWNLOADING YOUR YEAR... 24%', pct: 24 },
-    { text: 'APPLYING HOLOGRAPHIC FILTER... 48%', pct: 48 },
-    { text: 'GLITTER PARTICLES LOADING... 67%', pct: 67 },
-    { text: 'POLISHING THE CHROME... 85%', pct: 85 },
-    { text: 'ALMOST READY ♥ ... 96%', pct: 96 },
+    'reading your moments…',
+    'composing the year…',
+    'sorting by date…',
+    'drafting reflections…',
+    'choosing emoji…',
+    'almost ready…',
   ];
 
-  $loadingText.textContent = steps[0].text;
-  $bigProgressFill.style.width = steps[0].pct + '%';
+  $loadingText.textContent = steps[0];
 
   const timeouts = [];
-  steps.forEach((step, i) => {
+  steps.forEach((text, i) => {
     if (i === 0) return;
     const t = setTimeout(() => {
-      $loadingText.textContent = step.text;
-      $bigProgressFill.style.width = step.pct + '%';
+      $loadingText.style.opacity = '0';
+      setTimeout(() => {
+        $loadingText.textContent = text;
+        $loadingText.style.opacity = '1';
+      }, 200);
     }, i * 750);
     timeouts.push(t);
   });
@@ -346,61 +365,38 @@ function renderCurrentSlide(direction) {
 
   // Build the new card
   const card = document.createElement('div');
-  card.className = 'chrome-window chapter-card';
+  card.className = 'chapter-card';
 
   if (slide.type === 'opening') {
     card.classList.add('chapter-opening');
     card.innerHTML = `
-      <div class="chrome-window-header">
-        <span class="hdr-left">[X]</span>
-        <span class="hdr-title">C:\\YEAR\\STORY.EXE</span>
-        <span class="hdr-right">🛍 ✨ ♪</span>
-      </div>
-      <div class="chapter-inner">
-        <div class="opening-count">★ FILE LOADED SUCCESSFULLY ★</div>
-        <h1 class="opening-title">YOUR YEAR<br>IN MOMENTS</h1>
-        <p class="opening-subtitle">
-          your year had <strong>${slide.count} moments</strong> worth remembering.<br>
-          let's walk through them, one by one ✦
-        </p>
-        <div class="chapter-divider">✦ ✧ ⭒ ✦ ✧</div>
-        <p class="chapter-desc">use the arrows to navigate your story, or press → to begin</p>
-      </div>
+      <div class="opening-count">your year, ready to read</div>
+      <h1 class="opening-title">your year<br>in moments</h1>
+      <p class="opening-subtitle">
+        your year had <strong>${slide.count} moments</strong> worth remembering.<br>
+        let's walk through them, one by one.
+      </p>
+      <div class="chapter-divider"></div>
+      <p class="chapter-desc">use the arrows — or press → to begin</p>
     `;
   } else if (slide.type === 'chapter') {
     card.classList.add('chapter-moment');
     card.style.setProperty('--chapter-accent', slide.color);
+    card.style.setProperty('--chapter-accent-rgb', hexToRgb(slide.color));
     card.innerHTML = `
-      <div class="chrome-window-header">
-        <span class="hdr-left">[X]</span>
-        <span class="hdr-title">CHAPTER_${String(slide.index).padStart(2,'0')}.MOMENT</span>
-        <span class="hdr-right">💌 ✨</span>
+      <div class="chapter-ribbon">
+        <span>chapter ${String(slide.index).padStart(2, '0')} of ${String(slide.total).padStart(2, '0')}</span>
       </div>
-      <div class="chapter-scanlines" aria-hidden="true"></div>
-      <div class="chapter-shimmer" aria-hidden="true"></div>
-      <div class="chapter-inner">
-        <div class="chapter-ribbon">
-          <span class="ribbon-spark">✦</span>
-          <span>CHAPTER ${String(slide.index).padStart(2,'0')} OF ${String(slide.total).padStart(2,'0')}</span>
-          <span class="ribbon-spark">✦</span>
-        </div>
-        <div class="chapter-emoji-frame">
-          <div class="chapter-emoji-glow"></div>
-          <div class="chapter-emoji">${slide.emoji}</div>
-        </div>
-        <p class="chapter-note">${slide.note}</p>
-        <div class="chapter-divider">✦ ✧ ⭒</div>
-        <div class="chapter-date">${slide.monthName} ${slide.day}, ${slide.dayName}</div>
-        <p class="chapter-source-caption">SOURCE: "${slide.originalDesc}"</p>
+      <div class="chapter-date">
+        ${slide.monthName.toLowerCase()} ${slide.day}<span class="chapter-date-day">${slide.dayName.toLowerCase()}</span>
       </div>
+      <div class="chapter-emoji-frame">
+        <div class="chapter-emoji-glow"></div>
+        <div class="chapter-emoji">${slide.emoji}</div>
+      </div>
+      <p class="chapter-note">${slide.note}</p>
+      <p class="chapter-source-caption">source: "${slide.originalDesc}"</p>
     `;
-    // Tint the chrome window border with the accent color
-    card.style.borderColor = slide.color;
-    card.style.boxShadow = `
-      inset 1.5px 1.5px 0 var(--chrome-light),
-      inset -1.5px -1.5px 0 var(--chrome-shadow),
-      0 10px 30px ${slide.color}44,
-      0 2px 6px rgba(74, 74, 106, 0.18)`;
   } else if (slide.type === 'summary') {
     card.classList.add('chapter-summary');
     card.innerHTML = renderSummaryCard(slide);
@@ -453,80 +449,54 @@ function renderSummaryCard(slide) {
   `).join('');
 
   return `
-    <div class="chrome-window-header summary-slide-header">
-      <span class="hdr-left">[X]</span>
-      <span class="hdr-title">EXPORT_VIEWER.EXE</span>
-      <span class="hdr-right">📷 ✨ ♪</span>
-    </div>
-
     <div class="summary-slide-inner">
 
       <!-- The exportable card -->
       <div class="summary-card" id="summary-card-export">
-        <div class="summary-card-header">
-          <span class="hdr-left">[X]</span>
-          <span class="hdr-title">MY_YEAR_${year}.CARD</span>
-          <span class="hdr-right">🛍 ✨ ♪</span>
+        <p class="summary-kicker">a year in moments</p>
+
+        <div class="summary-year">
+          <span class="year-digits">${year}</span>
+          <div class="year-rule"></div>
         </div>
-        <div class="summary-card-body">
-          <div class="summary-deco-band top">✦ ─────────── ✦</div>
-          <p class="summary-kicker">a year in moments</p>
 
-          <div class="summary-year">
-            <span class="year-digits">${year}</span>
-            <div class="year-rule"></div>
+        <div class="summary-stats">
+          <div class="stat-tile">
+            <div class="stat-tile-header"><span>01</span></div>
+            <div class="stat-num">${stats.total}</div>
+            <div class="stat-label">moments</div>
           </div>
-
-          <div class="summary-stats">
-            <div class="stat-tile">
-              <div class="stat-tile-header"><span>✦</span><span>STAT_01</span></div>
-              <div class="stat-tile-body">
-                <div class="stat-num">${stats.total}</div>
-                <div class="stat-label">moments</div>
-              </div>
-            </div>
-            <div class="stat-tile">
-              <div class="stat-tile-header"><span>✦</span><span>STAT_02</span></div>
-              <div class="stat-tile-body">
-                <div class="stat-num">${stats.peopleCount}</div>
-                <div class="stat-label">${stats.peopleCount === 1 ? 'person' : 'people'}</div>
-              </div>
-            </div>
-            <div class="stat-tile">
-              <div class="stat-tile-header"><span>✦</span><span>STAT_03</span></div>
-              <div class="stat-tile-body">
-                <div class="stat-num stat-num-sm">${stats.busiestMonthAbbr}</div>
-                <div class="stat-label">peak month</div>
-              </div>
-            </div>
+          <div class="stat-tile">
+            <div class="stat-tile-header"><span>02</span></div>
+            <div class="stat-num">${stats.peopleCount}</div>
+            <div class="stat-label">${stats.peopleCount === 1 ? 'person' : 'people'}</div>
           </div>
-
-          <div class="summary-section-rule">── ✦ HIGHLIGHTS ✦ ──</div>
-          <div class="summary-highlights">
-            ${highlightsHTML}
-          </div>
-
-          <div class="summary-section-rule">── ✦ THE THEME ✦ ──</div>
-          <div class="summary-theme">
-            <span class="theme-quote-mark theme-quote-open">&#10077;</span>
-            <p class="theme-text">${closingNote}</p>
-            <span class="theme-quote-mark theme-quote-close">&#10078;</span>
-          </div>
-
-          <div class="summary-deco-row">♪ ✧ ⭒ ✦ ✧ ♥ ✦</div>
-
-          <div class="summary-footer">
-            <span>✦ year-in-poetry · ${year} ✦</span>
+          <div class="stat-tile">
+            <div class="stat-tile-header"><span>03</span></div>
+            <div class="stat-num stat-num-sm">${stats.busiestMonthAbbr}</div>
+            <div class="stat-label">peak month</div>
           </div>
         </div>
+
+        <div class="summary-section-rule">highlights</div>
+        <div class="summary-highlights">${highlightsHTML}</div>
+
+        <div class="summary-section-rule">the theme</div>
+        <div class="summary-theme">
+          <span class="theme-quote-mark theme-quote-open">&#10077;</span>
+          <p class="theme-text">${closingNote}</p>
+          <span class="theme-quote-mark theme-quote-close">&#10078;</span>
+        </div>
+
+        <div class="summary-footer">year in moments · ${year}</div>
       </div>
 
       <!-- Action buttons (NOT included in export) -->
       <div class="summary-actions" data-export-skip="true">
-        <button class="btn-y2k btn-save-card" id="btn-save-card">
-          <span class="btn-text">✦ SAVE.PNG ✦</span>
+        <button class="btn-primary btn-compact btn-save-card" id="btn-save-card">
+          <span class="btn-text">save as image</span>
         </button>
-        <button class="btn-start-over" id="btn-start-over-dynamic">♪ create another year</button>
+        <button class="btn-start-over" id="btn-start-over-dynamic">create another year</button>
       </div>
 
     </div>
@@ -565,7 +535,7 @@ async function saveSummaryCard(btn) {
 
   const originalLabel = btn.querySelector('.btn-text').textContent;
   btn.disabled = true;
-  btn.querySelector('.btn-text').textContent = '⏳ EXPORTING...';
+  btn.querySelector('.btn-text').textContent = 'exporting…';
 
   try {
     if (typeof html2canvas === 'undefined') {
@@ -601,14 +571,14 @@ async function saveSummaryCard(btn) {
     link.href = canvas.toDataURL('image/png');
     link.click();
 
-    btn.querySelector('.btn-text').textContent = '✦ SAVED ♥ ✦';
+    btn.querySelector('.btn-text').textContent = 'saved';
     setTimeout(() => {
       btn.querySelector('.btn-text').textContent = originalLabel;
       btn.disabled = false;
     }, 1800);
   } catch (err) {
     console.error('Export failed:', err);
-    btn.querySelector('.btn-text').textContent = '!! TRY AGAIN ?';
+    btn.querySelector('.btn-text').textContent = 'try again?';
     setTimeout(() => {
       btn.querySelector('.btn-text').textContent = originalLabel;
       btn.disabled = false;
@@ -712,9 +682,8 @@ async function generate() {
     const data = await response.json();
     stopLoading();
 
-    // Brief flash to 100% before transition
-    $loadingText.textContent = '✦ READY ✦ — 100%';
-    $bigProgressFill.style.width = '100%';
+    // Brief settle moment before transition to the story
+    $loadingText.textContent = 'ready.';
     await new Promise(r => setTimeout(r, 450));
 
     renderStory(data);
@@ -722,8 +691,7 @@ async function generate() {
 
   } catch (err) {
     stopLoading();
-    $loadingText.textContent = '!! SYSTEM HICCUP — try again ?';
-    $bigProgressFill.style.width = '0%';
+    $loadingText.textContent = 'something went wrong — try again?';
     setTimeout(() => showScreen($input), 2500);
     console.error(err);
   }
@@ -750,14 +718,3 @@ document.querySelectorAll('.suggestion-chip').forEach(chip => {
   });
 });
 
-// Subtle parallax on the heroine window based on mouse position (landing only)
-document.addEventListener('mousemove', (e) => {
-  if (!$landing.classList.contains('active')) return;
-  const heroine = document.getElementById('heroine-window');
-  if (heroine) {
-    const mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-    const mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-    heroine.style.transform =
-      `rotate(2deg) translate(${mouseX * 8}px, ${mouseY * 8}px)`;
-  }
-});
