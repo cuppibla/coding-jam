@@ -12,7 +12,7 @@ fridge-chef/
 │   │   ├── gemini_service.py # Gemini text + image generation
 │   │   ├── prompts.py        # Prompt templates for recipe & photo
 │   │   └── config.py         # Pydantic settings (.env loader)
-│   ├── .env                  # Vertex AI credentials
+│   ├── .env                  # Gemini API key
 │   └── pyproject.toml
 └── frontend/          ← Static HTML/CSS/JS
     ├── index.html
@@ -36,12 +36,10 @@ uv sync
 
 ### 3. Configure environment
 
-Edit `.env` if needed (defaults are pre-configured for Vertex AI):
+Create a `.env` file in `backend/` with your Gemini API key (get one at https://aistudio.google.com/apikey):
 
 ```env
-GOOGLE_CLOUD_PROJECT=neon-emitter-458622-e3
-GOOGLE_CLOUD_LOCATION=global
-GOOGLE_GENAI_USE_VERTEXAI=true
+GEMINI_API_KEY=your-api-key-here
 ```
 
 ### 4. Start the server

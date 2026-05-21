@@ -21,11 +21,7 @@ def _get_client():
     if _client is None:
         import google.genai as genai
 
-        _client = genai.Client(
-            vertexai=settings.GOOGLE_GENAI_USE_VERTEXAI,
-            project=settings.GOOGLE_CLOUD_PROJECT,
-            location=settings.GOOGLE_CLOUD_LOCATION,
-        )
+        _client = genai.Client(api_key=settings.GEMINI_API_KEY)
     return _client
 
 
@@ -116,7 +112,6 @@ async def generate_food_image(photo_description: str) -> bytes | None:
                 ],
                 image_config=types.ImageConfig(
                     aspect_ratio="16:9",
-                    output_mime_type="image/png",
                 ),
             ),
         )
